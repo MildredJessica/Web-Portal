@@ -9,7 +9,8 @@ export class ApiError extends Error {
 
 async function request(path, options = {}) {
   const token = localStorage.getItem('access_token')
-
+  console.log('Token from localStorage:', token)
+  console.log('Requesting:', path)
   const res = await fetch(`${API_BASE}${path}`, {
     credentials: 'include',
     headers: {
