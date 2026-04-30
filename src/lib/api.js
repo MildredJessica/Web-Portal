@@ -7,23 +7,20 @@ export class ApiError extends Error {
   }
 }
 
-async function request(path, options = {}) {
-  const token = localStorage.getItem('access_token')
-  console.log('Token from localStorage:', token)
-  console.log('Requesting:', path)
-  const res = await fetch(`${API_BASE}${path}`, {
-    credentials: 'include',
-    headers: {
-      'Content-Type': 'application/json',
-      'X-API-Version': '1',
-      'Cache-Control': 'no-cache', 
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
-      ...options.headers,
-    },
-    ...options,
-  })
+function isTokenExpired(token) {
+  try {
+    const payload = JSON.parse(atob(token.split('.')[1]))
+    return payload.exp * 1000 < Date.now()
+  } catch {
+    return true
+  }
+}
 
-  if (res.status === 401 && !options._retry && path !== '/auth/refresh') {
+
+async function request(path, options = {}) {
+  let token = localStorage.getItem('access_token')
+
+  if (token && isTokenExpired(token)  && path !== '/auth/refresh') {
     try {
       const refreshToken = localStorage.getItem('refresh_token')
       const refreshed = await fetch(`${API_BASE}/auth/refresh`, {
@@ -46,6 +43,20 @@ async function request(path, options = {}) {
     localStorage.removeItem('refresh_token')
     throw new ApiError('Session expired', 401)
   }
+
+  const res = await fetch(`${API_BASE}${path}`, {
+    credentials: 'include',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-API-Version': '1',
+      'Cache-Control': 'no-cache', 
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      ...options.headers,
+    },
+    ...options,
+  })
+
+  
 
   if (!res.ok) {
     const body = await res.json().catch(() => ({}))
