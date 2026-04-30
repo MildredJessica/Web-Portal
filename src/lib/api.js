@@ -52,7 +52,7 @@ async function request(path, options = {}) {
 // ── Auth ──────────────────────────────────────────────────────────────────────
 export const auth = {
   // loginUrl is a browser redirect — needs full backend URL, not Vite proxy
-  loginUrl: () => `${import.meta.env.VITE_API_URL || 'http://localhost:4000'}/auth/github`,
+  loginUrl: () => `${import.meta.env.VITE_API_URL}/auth/github`,
   me: () => request('/auth/me'),
   logout: () => request('/auth/logout', { method: 'POST' }),
 }

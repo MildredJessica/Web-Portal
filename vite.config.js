@@ -7,7 +7,7 @@ export default defineConfig({
     port: 5173,
     proxy: {
       '/auth': {
-        target: 'http://localhost:4000',
+        target: 'https://backend-com.up.railway.app',
         changeOrigin: true,
         secure: false,
         configure: (proxy) => {
@@ -26,7 +26,7 @@ export default defineConfig({
         },
       },
       '/api': {
-        target: 'http://localhost:4000',
+        target: 'https://backend-com.up.railway.app',
         changeOrigin: true,
         secure: false,
       },
