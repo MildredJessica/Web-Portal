@@ -9,6 +9,8 @@ import ProfileDetail from './pages/ProfileDetail.jsx'
 import Search from './pages/Search.jsx'
 import Account from './pages/Account.jsx'
 import Layout from './components/layout/Layout.jsx'
+import AuthCallback from './pages/AuthCallback.jsx'
+
 
 function ProtectedRoute({ children }) {
   const { user, loading } = useAuth()
@@ -22,6 +24,7 @@ export default function App() {
     <AuthProvider>
       <BrowserRouter>
         <Routes>
+        <Route path="/auth/callback" element={<AuthCallback />} />
           <Route path="/login" element={<Login />} />
           <Route
             path="/"

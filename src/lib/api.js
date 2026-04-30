@@ -7,38 +7,41 @@ export class ApiError extends Error {
   }
 }
 
-let isRedirectingToLogin = false
-
 async function request(path, options = {}) {
-  console.log("path, ", path)
+  const token = localStorage.getItem('access_token')
+
   const res = await fetch(`${API_BASE}${path}`, {
     credentials: 'include',
     headers: {
       'Content-Type': 'application/json',
       'X-API-Version': '1',
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
       ...options.headers,
     },
     ...options,
   })
 
-  // Silent token refresh on 401 — skip for /auth/refresh to avoid infinite loop
   if (res.status === 401 && !options._retry && path !== '/auth/refresh') {
     try {
+      const refreshToken = localStorage.getItem('refresh_token')
       const refreshed = await fetch(`${API_BASE}/auth/refresh`, {
         method: 'POST',
-        credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ refresh_token: refreshToken }),
       })
 
       if (refreshed.ok) {
-        // Tokens rotated — retry original request
+        const data = await refreshed.json()
+        localStorage.setItem('access_token', data.access_token)
+        localStorage.setItem('refresh_token', data.refresh_token)
         return request(path, { ...options, _retry: true })
       }
     } catch {
-      // Network error during refresh — fall through to session expired
+      // fall through
     }
 
-    // Both tokens expired — throw so AuthContext can redirect cleanly
+    localStorage.removeItem('access_token')
+    localStorage.removeItem('refresh_token')
     throw new ApiError('Session expired', 401)
   }
 
@@ -50,12 +53,18 @@ async function request(path, options = {}) {
   return res.json()
 }
 
-// ── Auth ──────────────────────────────────────────────────────────────────────
+// update logout to clear localStorage
 export const auth = {
-  // loginUrl is a browser redirect — needs full backend URL, not Vite proxy
   loginUrl: () => `${import.meta.env.VITE_API_URL}/auth/github`,
   me: () => request('/auth/me'),
-  logout: () => request('/auth/logout', { method: 'POST' }),
+  logout: async () => {
+    await request('/auth/logout', {
+      method: 'POST',
+      body: JSON.stringify({ refresh_token: localStorage.getItem('refresh_token') }),
+    })
+    localStorage.removeItem('access_token')
+    localStorage.removeItem('refresh_token')
+  },
 }
 
 // ── Profiles ──────────────────────────────────────────────────────────────────
