@@ -16,6 +16,7 @@ async function request(path, options = {}) {
     headers: {
       'Content-Type': 'application/json',
       'X-API-Version': '1',
+      'Cache-Control': 'no-cache', 
       ...(token ? { Authorization: `Bearer ${token}` } : {}),
       ...options.headers,
     },
