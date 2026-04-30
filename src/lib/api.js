@@ -1,4 +1,4 @@
-const API_BASE = import.meta.env.VITE_API_URL || ''
+const API_BASE = import.meta.env.VITE_API_URL
 
 export class ApiError extends Error {
   constructor(message, status) {
@@ -10,6 +10,7 @@ export class ApiError extends Error {
 let isRedirectingToLogin = false
 
 async function request(path, options = {}) {
+  console.log("path, ", path)
   const res = await fetch(`${API_BASE}${path}`, {
     credentials: 'include',
     headers: {

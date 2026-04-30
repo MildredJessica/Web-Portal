@@ -1,4 +1,5 @@
-import { useAuth } from '../context/AuthContext.jsx'
+// import { useAuth } from '../context/AuthContext.jsx'
+import { useAuth } from '../hooks/useAuth.js'
 
 export default function Account() {
   const { user, logout } = useAuth()

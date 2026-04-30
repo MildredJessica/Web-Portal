@@ -1,7 +1,9 @@
 import { useEffect, useState, useCallback } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import { profiles as profilesApi } from '../lib/api.js'
-import { useAuth } from '../context/AuthContext.jsx'
+// import { useAuth } from '../context/AuthContext.jsx'
+import { useAuth } from '../hooks/useAuth.js'
+
 
 export default function ProfileList() {
   const { user } = useAuth()

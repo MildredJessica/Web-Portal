@@ -1,6 +1,7 @@
 import { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { useAuth } from '../context/AuthContext.jsx'
+import { useAuth } from '../hooks/useAuth.js'
+// import { useAuth } from '../context/AuthContext.jsx'
 import { auth } from '../lib/api.js'
 
 export default function Login() {

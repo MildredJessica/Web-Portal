@@ -1,7 +1,7 @@
 import { createContext, useContext, useEffect, useState } from 'react'
 import { auth, ApiError } from '../lib/api.js'
 
-const AuthContext = createContext(null)
+export const AuthContext = createContext(null)
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null)
@@ -10,7 +10,7 @@ export function AuthProvider({ children }) {
   const fetchUser = async () => {
     try {
       const data = await auth.me()
-      setUser(data?.data ?? null)
+      setUser(res.data.data)
     } catch (err) {
       setUser(null)
       // Only redirect if session is explicitly expired (401)
@@ -25,6 +25,12 @@ export function AuthProvider({ children }) {
       setLoading(false)
     }
   }
+  // useEffect(() => {
+  //   api.get('/auth/me')
+  //     .then(res => setUser(res.data.data))
+  //     .catch(() => setUser(null))
+  //     .finally(() => setLoading(false))
+  // }, [])
 
   useEffect(() => {
     fetchUser()
@@ -38,11 +44,10 @@ export function AuthProvider({ children }) {
 
   return (
     <AuthContext.Provider value={{ user, loading, logout, setUser, refetchUser: fetchUser }}>
+     {/* <AuthContext.Provider value={{ user, loading, logout}}> */}
       {children}
     </AuthContext.Provider>
   )
 }
-
-export const useAuth = () => useContext(AuthContext)
-
+// export const useAuth = () => useContext(AuthContext)
 
